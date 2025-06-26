@@ -29,6 +29,13 @@ public:
     
     virtual QString visualizerName() const override { return "Pong"; }
 
+    enum class PlayerMode {
+        OnePlayerMode,
+        TwoPlayersMode
+    };
+
+    void setPlayerMode(const PlayerMode mode) { m_mode = mode; }
+
 public slots:
     void move1Up(bool keyPress);
     void move1Down(bool keyPress);
@@ -82,6 +89,9 @@ private:
 
     void updateScoreLabel();
     void updateTimerLabel();
+
+private:
+    PlayerMode m_mode{PlayerMode::OnePlayerMode};
 
     int m_safeDrawing = 0;
 

@@ -15,6 +15,8 @@ ldPong::ldPong(QObject *parent)
     keyMap[ldGamepad::Button::Up] = Qt::Key_Up;
     keyMap[ldGamepad::Button::Down] = Qt::Key_Down;
     get_gamepadCtrl()->init(keyMap, m_keyDescriptions);
+
+    m_visualizer->setPlayerMode(ldPongVisualizer::PlayerMode::TwoPlayersMode);
 }
 
 ldPong::~ldPong()

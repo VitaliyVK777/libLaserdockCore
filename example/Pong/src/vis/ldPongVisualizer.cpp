@@ -108,30 +108,35 @@ void ldPongVisualizer::draw() {
     // init at each draw
     m_safeDrawing = 0;
 
+    const auto moveBoardByPlayer = [this](const int playerKey, const bool keyPressedUp, const bool keyPressedDown) {
+        if (keyPressedUp) {
+            moveBoard(playerKey, BOARD_STEP);
+        }
+        if (keyPressedDown) {
+            moveBoard(playerKey, -1 * BOARD_STEP);
+        }
+        if (m_axis < 0.05f || m_axis > 0.05f) {
+            moveBoard(playerKey, BOARD_STEP * m_axis * 1.5f);
+        }
+    };
+
     //Board: MEO jumpiness fix
     if(!m_timer.isActive()) {
-        if (m_keyPressedUp) { //MEO: when added A.I., swapped player keys
-            moveBoard(0, BOARD_STEP);
+        if (m_mode == PlayerMode::OnePlayerMode) {
+            moveBoardByPlayer(0, m_keyPressedUp, m_keyPressedDown);
+        } else {
+            moveBoardByPlayer(0, m_keyPressedUpBoard1, m_keyPressedDownBoard1);
+            moveBoardByPlayer(1, m_keyPressedUp, m_keyPressedDown);
         }
-        if (m_keyPressedDown) {
-            moveBoard(0, -1*BOARD_STEP);
-        }
-        if(m_axis < 0.05f || m_axis > 0.05f) {
-            moveBoard(0, BOARD_STEP * m_axis * 1.5f);
-        }
-    }
-    if (m_keyPressedUpBoard1) { //MEO: when added A.I., swapped player keys
-        //boardUp(1); //ToDo -reimplement when AI/2nd player choice
-    }
-    if (m_keyPressedDownBoard1) {
-        //boardDown(1);
     }
 
     //A.I.
-    m_secondBoardBottomY += 0.1f * (((1.0f + m_ballPos.y) - ((1.0f + m_secondBoardBottomY) + (BOARD_LENGTH / 2.0f))) * qPow((1.0f + m_ballPos.x) / 2.0f, 2.5f));
-    m_secondBoardBottomY = std::max(m_secondBoardBottomY, MIN_Y);
-    m_secondBoardBottomY = std::min(m_secondBoardBottomY, MAX_Y);
-    if (m_secondBoardBottomY != m_secondBoardBottomY) m_secondBoardBottomY = MIN_Y; //check for infinity and correct
+    if (m_mode == PlayerMode::OnePlayerMode) {
+        m_secondBoardBottomY += 0.1f * (((1.0f + m_ballPos.y) - ((1.0f + m_secondBoardBottomY) + (BOARD_LENGTH / 2.0f))) * qPow((1.0f + m_ballPos.x) / 2.0f, 2.5f));
+        m_secondBoardBottomY = std::max(m_secondBoardBottomY, MIN_Y);
+        m_secondBoardBottomY = std::min(m_secondBoardBottomY, MAX_Y);
+        if (m_secondBoardBottomY != m_secondBoardBottomY) m_secondBoardBottomY = MIN_Y; //check for infinity and correct
+    }
 
     /*
      * DRAW
