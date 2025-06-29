@@ -44,6 +44,18 @@ ldPongVisualizer::ldPongVisualizer() : ldAbstractGameVisualizer() {
     m_stateLabel.reset(new ldTextLabel());
     m_stateLabel->setColor(0xFFFFFF);
 
+    m_menuLabel.reset(new ldTextLabel("Mode (1)"));
+    m_menuLabel->setFontSize(1.0f / 30);
+    m_menuLabel->setColor(0xFFFFFF);
+
+    m_onePlayerMenuLabel.reset(new ldTextLabel("One player (1)"));
+    m_onePlayerMenuLabel->setFontSize(1.0f / 30);
+    m_onePlayerMenuLabel->setColor(0x0000FF);
+
+    m_twoPlayersMenuLabel.reset(new ldTextLabel("Two players (2)"));
+    m_twoPlayersMenuLabel->setFontSize(1.0f / 30);
+    m_twoPlayersMenuLabel->setColor(0xFFFFFF);
+
     setPosition(ccp(1, 1));
 
     qRegisterMetaType<std::pair<int, int> >();
@@ -53,6 +65,33 @@ ldPongVisualizer::ldPongVisualizer() : ldAbstractGameVisualizer() {
 }
 
 ldPongVisualizer::~ldPongVisualizer() {
+}
+
+void ldPongVisualizer::setPlayerModeLocked(const PlayerMode mode) {
+    m_mode = mode;
+    m_menuLabel->setText(mode == PlayerMode::OnePlayerMode ? "Mode (1)" : "Mode (2)");
+    m_onePlayerMenuLabel->setColor(mode == PlayerMode::OnePlayerMode ? 0x0000FF : 0xFFFFFF);
+    m_twoPlayersMenuLabel->setColor(mode == PlayerMode::TwoPlayersMode ? 0x0000FF : 0xFFFFFF);
+}
+
+void ldPongVisualizer::setPlayerMode(const PlayerMode mode) {
+    QMutexLocker lock(&m_mutex);
+    setPlayerModeLocked(mode);
+}
+
+void ldPongVisualizer::toggleMode() {
+    QMutexLocker lock(&m_mutex);
+    setPlayerModeLocked(m_mode == PlayerMode::OnePlayerMode ? PlayerMode::TwoPlayersMode : PlayerMode::OnePlayerMode);
+}
+
+bool ldPongVisualizer::isMenuShown() {
+    QMutexLocker lock(&m_mutex);
+    return m_menuShown;
+}
+
+void ldPongVisualizer::toggleMenu() {
+    QMutexLocker lock(&m_mutex);
+    m_menuShown = !m_menuShown;
 }
 
 void ldPongVisualizer::move1Up(bool keyPress) {
@@ -104,6 +143,19 @@ void ldPongVisualizer::draw() {
     const float MAX_Y = BOUNDS - BOARD_LENGTH;
     const float MIN_Y = -1.0f * BOUNDS;
     QMutexLocker lock(&m_mutex);
+
+    if (state() == ldGameState::Reset) {
+        m_menuLabel->setPosition(ldVec2(0.02f, 0.9f));
+        m_menuLabel->innerDraw(m_renderer);
+
+        if (m_menuShown) {
+            m_onePlayerMenuLabel->setPosition(ldVec2(0.05f, 0.8f));
+            m_onePlayerMenuLabel->innerDraw(m_renderer);
+
+            m_twoPlayersMenuLabel->setPosition(ldVec2(0.05f, 0.7f));
+            m_twoPlayersMenuLabel->innerDraw(m_renderer);
+        }
+    }
 
     // init at each draw
     m_safeDrawing = 0;
@@ -360,6 +412,11 @@ void ldPongVisualizer::onGameReset()
 
 void ldPongVisualizer::onGamePlay()
 {
+    {
+        QMutexLocker lock(&m_mutex);
+        m_menuShown = false;
+    }
+
     startTimer();
 }
 

@@ -82,7 +82,7 @@ QStringList ldAbstractGame::get_keyDescriptions() const
 }
 
 bool ldAbstractGame::eventFilter(QObject *obj, QEvent *ev) {
-    if(get_state() != ldAbstractGame::Playing) {
+    if (!filterKeyEvent()) {
         return QObject::eventFilter(obj, ev);
     }
 
@@ -187,6 +187,10 @@ void ldAbstractGame::activate()
 void ldAbstractGame::deactivate()
 {
     //    pause();
+}
+
+bool ldAbstractGame::filterKeyEvent() const {
+    return get_state() == ldAbstractGame::Playing;
 }
 
 void ldAbstractGame::onGameStateChanged(const ldAbstractGameVisualizer::ldGameState &state)

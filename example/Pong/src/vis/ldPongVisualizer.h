@@ -34,7 +34,11 @@ public:
         TwoPlayersMode
     };
 
-    void setPlayerMode(const PlayerMode mode) { m_mode = mode; }
+    void setPlayerMode(const PlayerMode mode);
+    void toggleMode();
+
+    bool isMenuShown();
+    void toggleMenu();
 
 public slots:
     void move1Up(bool keyPress);
@@ -68,6 +72,8 @@ private:
     virtual void onGameReset() override final;
     virtual void onGamePlay() override final;
     virtual void onGamePause() override final;
+
+    void setPlayerModeLocked(const PlayerMode mode);
 
     // get angle closer to X-axis so pong computer can catch it
     void adjustBallSpeedToXAxis();
@@ -121,6 +127,11 @@ private:
 
     QTimer m_timer;
     QScopedPointer<ldTextLabel> m_stateLabel;
+
+    bool m_menuShown{false};
+    QScopedPointer<ldTextLabel> m_menuLabel;
+    QScopedPointer<ldTextLabel> m_onePlayerMenuLabel;
+    QScopedPointer<ldTextLabel> m_twoPlayersMenuLabel;
 };
 
 #endif /*__LaserdockVisualizer__ldPongVisualizer__*/

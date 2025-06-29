@@ -18,6 +18,7 @@ public:
     virtual ~ldPong();
 
 private:
+    virtual bool filterKeyEvent() const final { return true; }
     virtual bool handleKeyEvent(QKeyEvent *keyEvent) override;
     virtual ldAbstractGameVisualizer *getGameVisualizer() const override;
 

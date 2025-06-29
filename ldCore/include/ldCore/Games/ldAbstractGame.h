@@ -129,6 +129,7 @@ signals:
 protected:
     virtual void activate();
     virtual void deactivate();
+    virtual bool filterKeyEvent() const;
 
     QStringList m_levelList;
     QString m_levelListName;

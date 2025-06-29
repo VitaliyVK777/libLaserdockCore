@@ -15,8 +15,6 @@ ldPong::ldPong(QObject *parent)
     keyMap[ldGamepad::Button::Up] = Qt::Key_Up;
     keyMap[ldGamepad::Button::Down] = Qt::Key_Down;
     get_gamepadCtrl()->init(keyMap, m_keyDescriptions);
-
-    m_visualizer->setPlayerMode(ldPongVisualizer::PlayerMode::TwoPlayersMode);
 }
 
 ldPong::~ldPong()
@@ -25,6 +23,41 @@ ldPong::~ldPong()
 
 bool ldPong::handleKeyEvent(QKeyEvent *keyEvent)
 {
+    if (m_visualizer->state() == ldAbstractGameVisualizer::ldGameState::Reset) {
+        if (keyEvent->type() == QEvent::KeyPress) {
+            switch (keyEvent->key()) {
+            case Qt::Key_F10:
+                m_visualizer->toggleMenu();
+                break;
+            case Qt::Key_1:
+                m_visualizer->setPlayerMode(ldPongVisualizer::PlayerMode::OnePlayerMode);
+                break;
+            case Qt::Key_2:
+                m_visualizer->setPlayerMode(ldPongVisualizer::PlayerMode::TwoPlayersMode);
+                break;
+            case Qt::Key_Up:
+                if (!m_visualizer->isMenuShown())
+                    m_visualizer->toggleMenu();
+                m_visualizer->toggleMode();
+                break;
+            case Qt::Key_Down:
+                if (!m_visualizer->isMenuShown())
+                    m_visualizer->toggleMenu();
+                m_visualizer->toggleMode();
+                break;
+            case Qt::Key_Escape:
+                if (m_visualizer->isMenuShown())
+                    m_visualizer->toggleMenu();
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
     if(keyEvent->type() == QEvent::KeyPress) {
         switch (keyEvent->key()) {
         case Qt::Key_W:
